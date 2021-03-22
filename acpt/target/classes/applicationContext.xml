@@ -3,5 +3,6 @@
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
 
-    <bean id="userDao" class="com.mosheyu.dao.impl.UserDaoImpl"></bean>
+<!--    <bean id="userDao" class="com.mosheyu.dao.impl.UserDaoImpl" init-method="init" destroy-method="destory"></bean>-->
+    <bean id="userDao" class="com.mosheyu.factory.StaticFactory" factory-method="getUserDao"></bean><!--工厂静态方法实例化-->
 </beans>
