@@ -6,13 +6,15 @@ import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 public class UserServiceImpl implements UserService {
 
+    //设置dao属性以及setter方法。以供依赖注入。
+    private UserDao userDao;
 
-
+    public void setUserDao(UserDao userDao) {
+        this.userDao = userDao;
+    }
 
     @Override
     public void save() {
-        ClassPathXmlApplicationContext app = new ClassPathXmlApplicationContext("applicationContext.xml");
-        UserDao userDao = (UserDao)app.getBean("userDao");
         userDao.out();
     }
 }

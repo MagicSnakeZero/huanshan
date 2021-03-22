@@ -13,7 +13,10 @@
 <!--    <bean id="userDao" factory-bean="factory" factory-method="getUserDao"></bean>-->
 
     <bean id="userDao" class="com.mosheyu.dao.impl.UserDaoImpl"></bean>
-    <bean id="userService" class="com.mosheyu.service.impl.UserServiceImpl"></bean>
+    <bean id="userService" class="com.mosheyu.service.impl.UserServiceImpl" >
+        <property name="userDao" ref="userDao"></property>
+        <!-- 通过service的属性以及setter方法，注入依赖对象。  -->
+    </bean>
 
 
 
