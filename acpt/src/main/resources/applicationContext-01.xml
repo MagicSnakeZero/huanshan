@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+    <!-- xmlns:p="http://www.springframework.org/schema/p"    命名空间，setter依赖注入第二种 -->
+
+    <!--    实际开发中，spring的配置很复杂且体积很大，所以配置文件可以拆开配置，然后在主配置文件中通过import标签加载
+        <import resource="applicationContext-xxx.xml"></import>-->
+
+
+    <!--    Bean实例化三种方式：1.无参构造方法实例化2.工厂静态方法实例化3.工厂实例方法实例化-->
+    <!--    无参构造方法实例化-->
+    <!--    <bean id="userDao" class="com.mosheyu.dao.impl.UserDaoImpl" init-method="init" destroy-method="destory"></bean>-->
+    <!--    工厂静态方法实例化  依靠工厂类内部的静态方法-->
+    <!--    <bean id="userDao" class="com.mosheyu.factory.StaticFactory" factory-method="getUserDao"></bean>-->
+    <!--    工厂实例方法实例化  依靠工厂对象实例化后，使用对象的该方法-->
+    <!--    <bean id="factory" class="com.mosheyu.factory.DynamicFactory"></bean>-->
+    <!--    <bean id="userDao" factory-bean="factory" factory-method="getUserDao"></bean>-->
+
+
+
+    <!--            依赖注入第一种：setter方法注入
+        <bean id="userDao" class="com.mosheyu.dao.impl.UserDaoImpl"></bean>
+        <bean id="userService" class="com.mosheyu.service.impl.UserServiceImpl" p:userDao-ref="userDao" >
+    &lt;!&ndash;        p:userDao-ref="userDao"    命名空间注入&ndash;&gt;
+
+            <property name="userDao" ref="userDao"></property>
+    &lt;!&ndash;         通过service的属性以及setter方法，注入依赖对象。  &ndash;&gt;
+        </bean>-->
+
+
+    <!--    &lt;!&ndash;            依赖注入第二种：有参方法注入    &ndash;&gt;
+        <bean id="userDao" class="com.mosheyu.dao.impl.UserDaoImpl"></bean>
+        <bean id="userService" class="com.mosheyu.service.impl.UserServiceImpl">
+            <constructor-arg name="userDao" ref="userDao"></constructor-arg>
+        </bean>-->
+
+
+    <!--    注入普通数据类型、引用数据类型、集合数据类型-->
+    <!--    <bean id="userDao" class="com.mosheyu.dao.impl.UserDaoImpl">
+            <property name="username" value="墨折羽"></property>
+            <property name="age" value="21"></property>
+        </bean>-->
+
+    <bean id="userDao" class="com.mosheyu.dao.impl.UserDaoImpl">
+        <property name="strList">
+            <list>
+                <value>第一个</value>
+                <value>第二个</value>
+                <value>第三个</value>
+            </list>
+        </property>
+        <property name="userMap">
+            <map>
+                <entry key="s1" value-ref="user1"></entry>
+                <entry key="s2" value-ref="user2"></entry>
+            </map>
+        </property>
+        <property name="properties">
+            <props>
+                <prop key="y1">pro1</prop>
+                <prop key="y2">pro2</prop>
+                <prop key="y3">pro3</prop>
+            </props>
+        </property>
+        <property name="username" value="墨折羽"></property>
+        <property name="age" value="21"></property>
+    </bean>
+
+    <bean id="user1" class="com.mosheyu.domain.User">
+        <property name="name" value="杨某某"></property>
+        <property name="addr" value="山西"></property>
+    </bean>
+    <bean id="user2" class="com.mosheyu.domain.User">
+        <property name="name" value="刘某某"></property>
+        <property name="addr" value="广州"></property>
+    </bean>
+
+
+
+    <bean id="userService" class="com.mosheyu.service.impl.UserServiceImpl">
+        <constructor-arg name="userDao" ref="userDao"></constructor-arg>
+    </bean>
+
+
+</beans>
