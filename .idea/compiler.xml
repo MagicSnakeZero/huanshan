@@ -6,11 +6,14 @@
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
-        <module name="acpt01" />
+        <module name="acpt02" />
+        <module name="acpt" />
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
+      <module name="acpt" target="11" />
       <module name="acpt01" target="11" />
+      <module name="acpt02" target="11" />
       <module name="apct" target="1.5" />
     </bytecodeTargetLevel>
   </component>
