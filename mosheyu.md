@@ -84,6 +84,8 @@ http://www.springframework.org/schema/context/spring-context.xsd
 5. 使用@Test创建测试方法进行测试
 
 注意：SpringJUnit4ClassRunner 需要搭配 4.12 及以上版本的 Junit 才可以执行。
+#### SpringMVC
+###### Spring与Web环境集成
 
 
 
