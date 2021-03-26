@@ -1,0 +1,21 @@
+<component name="ArtifactManager">
+  <artifact type="exploded-war" name="acpt03:war exploded">
+    <output-path>$PROJECT_DIR$/out/artifacts/acpt03_war_exploded</output-path>
+    <root id="root">
+      <element id="directory" name="WEB-INF">
+        <element id="directory" name="classes">
+          <element id="module-output" name="acpt03" />
+        </element>
+        <element id="directory" name="lib">
+          <element id="library" level="project" name="Maven: org.springframework:spring-context:5.3.4" />
+          <element id="library" level="project" name="Maven: org.springframework:spring-aop:5.3.4" />
+          <element id="library" level="project" name="Maven: org.springframework:spring-beans:5.3.4" />
+          <element id="library" level="project" name="Maven: org.springframework:spring-core:5.3.4" />
+          <element id="library" level="project" name="Maven: org.springframework:spring-jcl:5.3.4" />
+          <element id="library" level="project" name="Maven: org.springframework:spring-expression:5.3.4" />
+        </element>
+      </element>
+      <element id="javaee-facet-resources" facet="acpt03/web/Web" />
+    </root>
+  </artifact>
+</component>

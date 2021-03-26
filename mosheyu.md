@@ -43,14 +43,16 @@ http://www.springframework.org/schema/context
 http://www.springframework.org/schema/context/spring-context.xsd
 ~~~
 配置文件使用举例：
-~~~
-<context:property-placeholder location="classpath:jdbc.properties"/>
-<bean id="datasSourse" class="com.mchange.v2.c3p0.ComboPooledDataSource">
-      <property name="driverClass" value="${jdbc.driver}"></property>
-      <property name="jdbcUrl" value="${jdbc.url}"></property>
-      <property name="user" value="${jdbc.username}"></property>
-      <property name="password" value="${jdbc.password}"></property>
-</bean>
+~~~xml
+<beans>
+    <context:property-placeholder location="classpath:jdbc.properties"/>
+    <bean id="datasSourse" class="com.mchange.v2.c3p0.ComboPooledDataSource">
+         <property name="driverClass" value="${jdbc.driver}"></property>
+         <property name="jdbcUrl" value="${jdbc.url}"></property>
+         <property name="user" value="${jdbc.username}"></property>
+         <property name="password" value="${jdbc.password}"></property>
+    </bean>
+</beans>
 ~~~
 #### spring注解开发
 ###### 原始注解
@@ -84,15 +86,142 @@ http://www.springframework.org/schema/context/spring-context.xsd
 5. 使用@Test创建测试方法进行测试
 
 注意：SpringJUnit4ClassRunner 需要搭配 4.12 及以上版本的 Junit 才可以执行。
-#### SpringMVC
-###### Spring与Web环境集成
+## SSM学习第二章节——SpringMVC
+#### 配置Spring的Web环境
+配置servlet，继承HttpServlet类，或者实现接口。
+在web.xml中配置servlet。
+web中代码如下：
+~~~xml
+<web-app>
+   <servlet>
+        <servlet-name>UserServlet</servlet-name>
+        <servlet-class>com.mosheyu.web.UserServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>UserServlet</servlet-name>
+        <url-pattern>/userServlet </url-pattern>
+    </servlet-mapping>
+</web-app>
+~~~
+一般应用上下文对象是通过`new ClassPathXmlApplicationContext("配置文件")`方式获取到的。
 
+servlet应用监听器`ServletContextListener`获取应用上下文。避免为每一个Servlet编写一个new。
 
+过程：在Web应用启动时，就加载配置文件并创建应用上下文对象`ApplicationContext`，将对象存储到最大的域`servletContext`域中，这样就避免了大量的编写new来获取上下文对象。
 
+举例：
+创建监听器，创建应用上下文并存储到ServletContext域中。
+```java
+public class ContextLoaderListener implements ServletContextListener {
+    @Override
+    public void contextInitialized(ServletContextEvent servletContextEvent) {
+        ApplicationContext app = new ClassPathXmlApplicationContext("applicationContext.xml");
+        ServletContext servletContext = servletContextEvent.getServletContext();
+        servletContext.setAttribute("app",app);
+    }
+    @Override
+    public void contextDestroyed(ServletContextEvent servletContextEvent) {
+    }
+}
+```
+web.xml中配置监听器。
+```xml
+   <listener>
+        <listener-class>com.mosheyu.listener.ContextLoaderListener</listener-class>
+    </listener>
+```
+servlet中获取应用上下文
+```java
+public class UserServlet extends HttpServlet {
 
+    @Override
+    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        super.doGet(req, resp);
+        ServletContext servletContext = req.getServletContext();
+//        ServletContext servletContext = this.getServletContext();
+        ApplicationContext app = (ApplicationContext)servletContext.getAttribute("app");
+        UserService userService = app.getBean(UserService.class);
+        userService.out();
+    }
+}
+```
+此处为了将配置文件名存储到配置文件中，方便之后修改，将配置文件名配置到web.xml中作为全局参数。然后使用时从web.xml中获取。
 
+举例：
+```xml
+    <!-- 配置全局化参数   -->
+    <context-param>
+        <param-name>contextConfigLocation</param-name>
+        <param-value>applicationContext.xml</param-value>
+    </context-param>
+```
+监听器修改。
+```java
+public class ContextLoaderListener implements ServletContextListener {
+    @Override
+    public void contextInitialized(ServletContextEvent servletContextEvent) {
+        //将Spring的应用上下文对象，存储到ServletContext域中。
+        ServletContext servletContext = servletContextEvent.getServletContext();
+        //读取web.xml中的参数
+        String contextConfigLocation = servletContext.getInitParameter("contextConfigLocation");
+        ApplicationContext app = new ClassPathXmlApplicationContext(contextConfigLocation);
+        servletContext.setAttribute("app",app);
+    }
+    @Override
+    public void contextDestroyed(ServletContextEvent servletContextEvent) {
 
+    }
+}
+```
+此时获取获取应用上下文还需要记住ApplicationContext在ServletContext域中的别名，所以单独的写了一个静态工具方法，返回应用上下文对象。在使用时，调用相应的方法即可获取。
+```
+    public static ApplicationContext getApplicationContext(ServletContext servletContext){
+        return (ApplicationContext)servletContext.getAttribute("app");
+    }
+```
+上述是spring获取应用上下文的流程，在实际开发中，spring已经提供了相应的监听器`ContextLoaderListener`。在监听器内部来加载Spring配置文件，然后提供客户端工具类`WebApplicationContextUtils`来获取应用上下文对象。
 
+两步：
+1. 在web.xml中配置ContextLoaderListener监听器(导入spring-web坐标)。
+2. 使用WebApplicationContextUtils获取应用上下文对象ApplicationContext使用。
+
+步骤：
+添加新的包
+```xml
+  <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-web</artifactId>
+            <version>5.0.5.RELEASE</version>
+  </dependency>
+```
+web配置
+```xml
+<web-app>
+   <!-- 全局变量  -->
+   <context-param>
+      <param-name>contextConfigLocation</param-name>
+      <param-value>classpath:applicationContext.xml</param-value>
+   </context-param>
+   <!-- 监听器  -->
+   <listener>
+      <listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
+   </listener>
+</web-app>
+```
+servlet使用
+```java
+public class UserServlet extends HttpServlet {
+
+    @Override
+    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        super.doGet(req, resp);
+        ServletContext servletContext = this.getServletContext();
+        ApplicationContext app = WebApplicationContextUtils.getWebApplicationContext(servletContext);
+        UserService userService = app.getBean(UserService.class);
+        userService.out();
+    }
+}
+```
 
 
 

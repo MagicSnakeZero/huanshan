@@ -1,5 +1,5 @@
 <component name="ArtifactManager">
-  <artifact type="war" name="apct:war">
+  <artifact type="war" build-on-make="true" name="apct:war">
     <output-path>$PROJECT_DIR$/apct/target</output-path>
     <properties id="maven-jee-properties">
       <options>
