@@ -222,6 +222,128 @@ public class UserServlet extends HttpServlet {
     }
 }
 ```
+#### SpringMVC配置
+开发步骤：
+1. 导入SpringMVC包。
+2. 配置SpringMVC的核心控制器DispathcerServlet，用来配置Servlet的共有部分。
+3. 创建各个功能的Servlet。
+4. 将Servlet配置到Spring容器中。并且配置映射地址。
+5. 配置SpringMVC的核心文件spring-mvc.xml（一般命名为此），配置包扫描等。
+6. 使用测试。
+
+具体操作步骤：
+1.导包。
+```xml
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-webmvc</artifactId>
+            <version>5.0.5.RELEASE</version>
+        </dependency>
+```
+2.配置SpringMVC的前端控制器。
+```xml
+<web-app>
+   <servlet>
+      <servlet-name>DispatcherServlet</servlet-name>
+      <servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
+      <load-on-startup>1</load-on-startup>
+   </servlet>
+   <servlet-mapping>
+      <servlet-name>DispatcherServlet</servlet-name>
+      <url-pattern>/</url-pattern>
+   </servlet-mapping>
+
+</web-app>
+```
+3.创建自定义Servlet。
+```java
+public class UserController {
+    public String out(){
+        System.out.println("控制器执行了。");
+        return "testSpringMVC.jsp";
+    }
+}
+
+```
+4.配置映射地址。
+```java
+@Controller
+public class UserController {
+    
+    @RequestMapping("/quick")
+    public String out(){
+        System.out.println("控制器执行了。");
+        return "testSpringMVC.jsp";
+    }
+}
+```
+5.配置SpringMVC的核心文件spring-mvc.xml
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+                            http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-beans.xsd
+        ">
+    <!--  Controller组件扫描      -->
+<!--    <context:component-scan base-package="com.mosheyu.controller"/>-->
+    
+    
+</beans>
+```
+使用servlet的子元素init-param来为DispatcherServlet配置使用此配置文件。
+```xml
+<web-app>
+   <!-- 配置SpringMVC的前端控制器  -->
+   <servlet>
+      <servlet-name>DispatcherServlet</servlet-name>
+      <servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
+      <init-param>
+         <param-name>contextConfigLocation</param-name>
+         <param-value>classpath:spring-mvc.xml</param-value>
+      </init-param>
+      <load-on-startup>1</load-on-startup>
+   </servlet>
+   <servlet-mapping>
+      <servlet-name>DispatcherServlet</servlet-name>
+      <url-pattern>/</url-pattern>
+   </servlet-mapping>
+</web-app>
+```
+#### SpringMVC的组件解析
+###### SpringMVC的相关组件
+|组件|名称|
+|---|---|
+|前端控制器|DispathcherServlet|
+|处理器映射器|HandlerMapping|
+|处理器适配器|HandlerAdapter|
+|处理器|Handler|
+|视图解析器|View Resolver|
+|视图|view|
+###### SpringMVC执行流程：
+1. 客户端发送请求到前端控制器DispatcheServlet。
+2. 前端控制器收到请求调用HandleMapping处理映射器。
+3. 处理映射器找到具体的处理器，生成器对象以及处理器拦截器一并返回给前端控制器。
+4. 前端控制器调用HandleAdapter处理器适配器。
+5. HandleAdapter经过适配调用具体的处理器（后端控制器，即自定义的Servlet）。
+6. 后端控制器返回ModelAndView。
+7. HandleAdapter将返回过来的ModelAndView返回给前端控制器。
+8. 前端控制器将ModelAndView传给ViewReslove视图解析器。
+9. ViewReslove视图解析器解析后返回具体的View（jsp页面）。
+10. 前端控制器根据View进行渲染视图（将数据填充到视图中），前端控制器相应客户端。
+
+###### SpringMVC注解解析：
+**@RequestMapping**:请求映射，建立请求url和处理请求方法之间建立对应关系。
+属性：
+
+|属性|作用|
+|---|---|
+|value|指定请求的URL.|
+|mathod|指定请求的方式。指get，post等方法，使用现成的枚举类型。例：<br />`method=RequestMethod.GET`|
+|params|指定限制请求参数的条件，支持简单的表达式，要求请求参数的key和value必须和配置的一致。例：<br />1. `params={"name"}`指定参数必须有name参数。<br />2. `params={"moeny!100"}`指定请求参数中moeny不能是100.|
+## SSM学习第三章节——SpringMVC具体应用
+
 
 
 
