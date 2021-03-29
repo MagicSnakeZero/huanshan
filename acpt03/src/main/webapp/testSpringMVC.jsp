@@ -11,6 +11,6 @@
     <title>TestSpringMVC</title>
 </head>
 <body>
-测试SpringMVC
+测试SpringMVC${name}
 </body>
 </html>

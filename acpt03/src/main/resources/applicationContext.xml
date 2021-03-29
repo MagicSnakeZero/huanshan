@@ -7,4 +7,5 @@
     <bean id="userService" class="com.mosheyu.service.impl.UserServiceImpl">
         <property name="userDao" ref="userDao"></property>
     </bean>
+    <bean id="user" class="com.mosheyu.en.User"></bean>
 </beans>
