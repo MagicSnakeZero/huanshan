@@ -5,6 +5,7 @@
       <module fileurl="file://$PROJECT_DIR$/acpt01/acpt.iml" filepath="$PROJECT_DIR$/acpt01/acpt.iml" />
       <module fileurl="file://$PROJECT_DIR$/acpt02/acpt02.iml" filepath="$PROJECT_DIR$/acpt02/acpt02.iml" />
       <module fileurl="file://$PROJECT_DIR$/acpt03/acpt03.iml" filepath="$PROJECT_DIR$/acpt03/acpt03.iml" />
+      <module fileurl="file://$PROJECT_DIR$/acpt04/acpt04.iml" filepath="$PROJECT_DIR$/acpt04/acpt04.iml" />
       <module fileurl="file://$PROJECT_DIR$/jsTest/jsTest.iml" filepath="$PROJECT_DIR$/jsTest/jsTest.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/ssmStudyTest.iml" filepath="$PROJECT_DIR$/.idea/ssmStudyTest.iml" />
     </modules>

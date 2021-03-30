@@ -1155,11 +1155,83 @@ public class UserController {
 ```
 # SSM学习第五章节——SpringJdbcTemplate基本使用
 * * *
+### JdbcTemplate概述
+* * *
+Spring框架中提供的一个对象，对原始的JdbcAPI对象进行了简单的封装，提供了部分操作的模板类。  
+例：操作关系数据的`JdbcTemplate`和`HibernateTemplate`，操作nosql数据库的`RedisTemplate`，操作消息队列的`JmsTemplate`等等。  
+### JdbcTemplate开发步骤
+1. 导入spring-jdbc和spring-tx坐标。
+2. 创建数据库表和实体。
+3. 创建JdbcTemplate对象。
+4. 执行数据库操作。
 
+### 代码实现
+1.导入坐标
+```xml
+<dependencies>
+    <dependency>
+      <groupId>org.springframework</groupId>
+      <artifactId>spring-jdbc</artifactId>
+      <version>5.0.5.RELEASE</version>
+    </dependency>
 
+    <dependency>
+      <groupId>org.springframework</groupId>
+      <artifactId>spring-tx</artifactId>
+      <version>5.0.5.RELEASE</version>
+    </dependency>
+</dependencies>
+```
+2.创建数据库表和实体。
+数据库建立表`account`，表中建立两个字段，name，varchar（50），money，double,0.
+java建立实体类：  
+```java
+public class Account {
+   private String name;
+   private double money;
+}
+```
+3.创建JdbcTemplate对象。
+```java
+@Test
+public class JdbcTemplateTest {
+   @Test
+   public  void test1() throws PropertyVetoException {
+      //创建数据源对象
+      ComboPooledDataSource comboPooledDataSource = new ComboPooledDataSource();
+      comboPooledDataSource.setDriverClass("com.mysql.cj.jdbc.Driver");
+      comboPooledDataSource.setJdbcUrl("jdbc:mysql://localhost:3306/test?serverTimezone=UTC");
+      comboPooledDataSource.setUser("root");
+      comboPooledDataSource.setPassword("123456");
 
+      JdbcTemplate jdbcTemplate = new JdbcTemplate();
+      //设置数据源对象，知道数据库在哪儿。
+      jdbcTemplate.setDataSource(comboPooledDataSource);
+   }
+}
+```
+4.执行数据库操作
+```java
+public class JdbcTemplateTest {
+   @Test
+   public  void test1() throws PropertyVetoException{
+      //创建数据源对象
+      ComboPooledDataSource comboPooledDataSource = new ComboPooledDataSource();
+      comboPooledDataSource.setDriverClass("com.mysql.cj.jdbc.Driver");
+      comboPooledDataSource.setJdbcUrl("jdbc:mysql://localhost:3306/test?serverTimezone=UTC");
+      comboPooledDataSource.setUser("root");
+      comboPooledDataSource.setPassword("123456");
 
-
+      JdbcTemplate jdbcTemplate = new JdbcTemplate();
+      //设置数据源对象，知道数据库在哪儿。
+      jdbcTemplate.setDataSource(comboPooledDataSource);
+      //执行操作
+      int row = jdbcTemplate.update("insert into account values(?,?) ","tom",123);
+      System.out.println(row);
+   }
+}
+```
+### Spring产生JdbcTemplate对象
 
 
 
