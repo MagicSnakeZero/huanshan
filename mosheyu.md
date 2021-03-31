@@ -1160,12 +1160,14 @@ public class UserController {
 Spring框架中提供的一个对象，对原始的JdbcAPI对象进行了简单的封装，提供了部分操作的模板类。  
 例：操作关系数据的`JdbcTemplate`和`HibernateTemplate`，操作nosql数据库的`RedisTemplate`，操作消息队列的`JmsTemplate`等等。  
 ### JdbcTemplate开发步骤
+* * *
 1. 导入spring-jdbc和spring-tx坐标。
 2. 创建数据库表和实体。
 3. 创建JdbcTemplate对象。
 4. 执行数据库操作。
 
 ### 代码实现
+* * *
 1.导入坐标
 ```xml
 <dependencies>
@@ -1232,8 +1234,76 @@ public class JdbcTemplateTest {
 }
 ```
 ### Spring产生JdbcTemplate对象
+* * *
+配置applicationContext.xml文件。
+```
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+       http://www.springframework.org/schema/beans/spring-beans.xsd
+        http://www.springframework.org/schema/context
+       http://www.springframework.org/schema/context/spring-context.xsd">
+   <context:property-placeholder location="classpath:jdbc.properties"/>
+   <bean id="datasSource" class="com.mchange.v2.c3p0.ComboPooledDataSource">
+      <property name="driverClass" value="${jdbc.driver}"></property>
+      <property name="jdbcUrl" value="${jdbc.url}"></property>
+      <property name="user" value="${jdbc.username}"></property>
+      <property name="password" value="${jdbc.password}"></property>
+   </bean>
+   <bean id="jdbcTemplate" class="org.springframework.jdbc.core.JdbcTemplate">
+      <property name="dataSource" ref="datasSource"></property>
+   </bean>
+</beans>
+```
+配置jdbc.properties
+```
+jdbc.driver=com.mysql.cj.jdbc.Driver
+jdbc.url=jdbc:mysql://localhost:3306/test?serverTimezone=UTC
+jdbc.username=root
+jdbc.password=123456
+```
+实际应用：
+```java
+@RunWith(SpringJUnit4ClassRunner.class)
+@ContextConfiguration("classpath:applicationContext.xml")
+public class jdbcCRUDTest {
+    
+   @Autowired
+   private JdbcTemplate jdbcTemplate;
+   
+   @Test
+   public void testUpdate(){
+      int row = jdbcTemplate.update("update account set money=? where name=?",456,"tom");
 
-
+   }
+   @Test
+   public void testDeleter(){
+      int row = jdbcTemplate.update("delete from account where name=?","tom");
+      System.out.println(row);
+   }
+   @Test
+   public void testQuery(){
+      List<Account> accounts = jdbcTemplate.query("select * from account", new BeanPropertyRowMapper<Account>(Account.class));
+      Iterator<Account> it = accounts.iterator();
+      while (it.hasNext()){
+         System.out.println(it.next().toString());
+      }
+   }
+   @Test
+   public  void testQueryOne() {
+      Account a = jdbcTemplate.queryForObject("select * from account where name = ?",
+              new BeanPropertyRowMapper<Account>(Account.class), "tom");
+      System.out.println(a.toString());
+   }
+   @Test
+   public void testQueryCount(){
+      Long aLong = jdbcTemplate.queryForObject("select count(*) from account", Long.class);
+      System.out.println(aLong);
+   }
+}
+```
+# SSM学习第六章节——Spring项目练习
 
 
 

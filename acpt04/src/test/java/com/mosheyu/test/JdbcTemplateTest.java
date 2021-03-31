@@ -2,12 +2,12 @@ package com.mosheyu.test;
 
 import com.mchange.v2.c3p0.ComboPooledDataSource;
 import org.junit.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 
 import java.beans.PropertyVetoException;
 
 public class JdbcTemplateTest {
-
 
     //测试Jdbc模板的快速入门
     @Test
@@ -26,4 +26,12 @@ public class JdbcTemplateTest {
         int row = jdbcTemplate.update("insert into account values(?,?) ","tom",123);
         System.out.println(row);
     }
+
+
+
+
+
+
+
+
 }
