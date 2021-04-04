@@ -11,4 +11,6 @@ public interface UserService {
 
 
     void del(Long userId);
+
+    User login(String username, String password);
 }

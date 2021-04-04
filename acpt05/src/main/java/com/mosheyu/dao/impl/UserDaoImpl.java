@@ -66,4 +66,12 @@ public class UserDaoImpl implements UserDao {
         jdbcTemplate.update("delete from sys_user where Id =? ",userId);
     }
 
+    @Override
+    public User login(String username, String password) {
+        System.out.println(username.toString());
+        System.out.println(password.toString());
+        User user = jdbcTemplate.queryForObject("select * from sys_user where username = ? and password = ?",new BeanPropertyRowMapper<User>(User.class),username,password);
+        return user;
+    }
+
 }

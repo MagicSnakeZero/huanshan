@@ -23,4 +23,13 @@
 <!--    包扫描，加载controller包。-->
     <context:component-scan base-package="com.mosheyu.controller"/>
 
+    <mvc:interceptors>
+        <mvc:interceptor>
+<!--            配置对哪些请求拦截-->
+            <mvc:mapping path="/**"/>
+<!--            配置对哪些资源放行-->
+            <mvc:exclude-mapping path="/user/login"/>
+            <bean class="com.mosheyu.interceptor.PrivilegeInterceptor"></bean>
+        </mvc:interceptor>
+    </mvc:interceptors>
 </beans>

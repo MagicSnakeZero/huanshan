@@ -31,4 +31,10 @@ public class UserServiceImpl implements UserService {
     public void del(Long userId) {
         userDao.del(userId);
     }
+
+    @Override
+    public User login(String username, String password) {
+        User user = userDao.login(username,password);
+        return user;
+    }
 }

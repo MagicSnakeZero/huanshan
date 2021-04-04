@@ -1322,6 +1322,53 @@ public class jdbcCRUDTest {
 2. 配置拦截器。
 3. 测试拦截器的拦截效果。
 * * *
+### 创建拦截器
+* * *
+```java
+public class TargetInterceptor implements HandlerInterceptor {
+    //目标方法执行之前
+    @Override
+    public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
+        System.out.println("preHandle");
+        return false;
+    }
+    //目标方法执行之后，视图返回之前返回
+    @Override
+    public void postHandle(HttpServletRequest request, HttpServletResponse response, Object handler, ModelAndView modelAndView) throws Exception {
+        modelAndView.addObject("name","test");
+        System.out.println("postHandle");
+    }
+    //整个流程都执行完毕后执行
+    @Override
+    public void afterCompletion(HttpServletRequest request, HttpServletResponse response, Object handler, Exception ex) throws Exception {
+        System.out.println("afterCompletion");
+    }
+}
+```
+### 配置拦截器
+* * *
+```xml
+  <mvc:interceptors>
+        <mvc:interceptor>
+            <mvc:mapping path="/**"/>
+            <bean class="com.mosheyu.interceptor.TargetInterceptor"/>
+        </mvc:interceptor>
+        <mvc:interceptor>
+            <mvc:mapping path="/**"/>
+            <bean class="com.mosheyu.interceptor.TargetInterceptor2"/>
+        </mvc:interceptor>
+    </mvc:interceptors>
+```
+### 拦截器方法说明
+* * *
+|方法|说明|
+|---|---|
+|preHandle()|在请求处理之前调用，返回值为布尔类型，如果为false，后续的拦截器和控制器都不会执行。|
+|postHandle()|在请求处理之后，在DispathcherDervlet进行视图返回渲染之前调用。可以对Controller处理之后的ModelAndView对象进行操作。|
+|afterCompletion()|整个请求结束之后执行。|
+# SSM学习第八章节——SpringMVC异常处理机制
+* * *
+
 
 
 

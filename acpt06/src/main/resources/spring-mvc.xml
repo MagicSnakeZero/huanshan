@@ -16,5 +16,20 @@
         <property name="prefix" value="/"></property>
     </bean>
     <mvc:default-servlet-handler/>
+
     <context:component-scan base-package="com.mosheyu.controller"/>
+
+    <mvc:interceptors>
+        <mvc:interceptor>
+            <mvc:mapping path="/**"/>
+            <bean class="com.mosheyu.interceptor.TargetInterceptor"/>
+        </mvc:interceptor>
+        <mvc:interceptor>
+            <mvc:mapping path="/**"/>
+            <bean class="com.mosheyu.interceptor.TargetInterceptor2"/>
+        </mvc:interceptor>
+    </mvc:interceptors>
+
+
+
 </beans>
