@@ -1,6 +1,13 @@
 <component name="ArtifactManager">
   <artifact type="exploded-war" name="acpt05:war exploded">
-    <output-path>$PROJECT_DIR$/out/artifacts/acpt05_war_exploded</output-path>
+    <output-path>$PROJECT_DIR$/acpt05/target/acpt05</output-path>
+    <properties id="maven-jee-properties">
+      <options>
+        <exploded>true</exploded>
+        <module>acpt05</module>
+        <packaging>war</packaging>
+      </options>
+    </properties>
     <root id="root">
       <element id="directory" name="WEB-INF">
         <element id="directory" name="classes">
@@ -33,6 +40,9 @@
           <element id="library" level="project" name="Maven: org.springframework:spring-tx:5.0.5.RELEASE" />
           <element id="library" level="project" name="Maven: jstl:jstl:1.2" />
         </element>
+      </element>
+      <element id="directory" name="META-INF">
+        <element id="file-copy" path="$PROJECT_DIR$/acpt05/target/acpt05/META-INF/MANIFEST.MF" />
       </element>
       <element id="javaee-facet-resources" facet="acpt05/web/Web" />
     </root>

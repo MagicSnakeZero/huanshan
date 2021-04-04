@@ -3,6 +3,7 @@
   <component name="FrameworkDetectionExcludesConfiguration">
     <file type="web" url="file://$PROJECT_DIR$/acpt04" />
     <file type="web" url="file://$PROJECT_DIR$/acpt05" />
+    <file type="web" url="file://$PROJECT_DIR$/acpt06" />
     <file type="web" url="file://$PROJECT_DIR$/apct" />
   </component>
   <component name="MavenProjectsManager">
@@ -14,6 +15,7 @@
         <option value="$PROJECT_DIR$/acpt03/pom.xml" />
         <option value="$PROJECT_DIR$/acpt04/pom.xml" />
         <option value="$PROJECT_DIR$/acpt05/pom.xml" />
+        <option value="$PROJECT_DIR$/acpt06/pom.xml" />
       </list>
     </option>
   </component>
