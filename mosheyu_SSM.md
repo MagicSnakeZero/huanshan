@@ -1415,5 +1415,12 @@ public class ExceptionTest2 implements HandlerExceptionResolver {
  <bean class="com.mosheyu.exception.ExceptionTest2"></bean>
 ```
 # SSM学习第九章节——SpringAOP
+## Spring的AOP简介
+### AOP
+AOP为`Aspect Oriented Peogramming`的缩写，意思为**面向切面编程**。通过预编译方式和运行期间动态代理，实现程序功能的统一维护的一种技术。
+
+## 基于XML的AOP开发
+
+## 基于注解的AOP开发
 
 
