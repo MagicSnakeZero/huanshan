@@ -1368,7 +1368,52 @@ public class TargetInterceptor implements HandlerInterceptor {
 |afterCompletion()|整个请求结束之后执行。|
 # SSM学习第八章节——SpringMVC异常处理机制
 * * *
+系统的Dao、service、Controller出现异常，都会通过throws Exception向上抛出。最后由SpringMVC`前端控制器`交由`异常处理器(HandlerExceptionResolver)`进行异常处理。  
+异常处理的两种方式：  
+1. 使用SpringMVC提供的简单异常处理器`SimpleMappingExceptionResolver`。（简单的异常映射处理器，对应异常跳转对应页面）
+2. 实现Spring的异常处理接口`HandlerExceptionResolver`自定义异常处理器。  
+## 简单异常处理器
+SpringMVC已经定义好了该类型转换器，在使用时根据需求，进行相应的异常与视图的映射配置。
+```xml
+<!--    配置异常处理器-->
+    <bean class="org.springframework.web.servlet.handler.SimpleMappingExceptionResolver">
+<!--        通用的错误提示页面-->
+        <property name="defaultErrorView" value="error"></property>
+        <property name="exceptionMappings">
+            <map>
+                <entry key="java.lang.ClassCastException" value="error1"></entry>
+                <entry key="com.mosheyu.exception.ExceptionTest1" value="error2"></entry>
+            </map>
+        </property>
 
+    </bean>
+```
+## 自定义异常处理器
+步骤：  
+1. 创建异常处理器，实现HandlerExceptionResolver。
+2. 配置异常处理器。
+3. 编写异常页面。  
+### 创建异常处理器
+```java
+public class ExceptionTest2 implements HandlerExceptionResolver {
+    @Override
+    public ModelAndView resolveException(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse, Object o, Exception e) {
+        ModelAndView modelAndView = new ModelAndView();
 
+        if(e instanceof ExceptionTest1){
+            modelAndView.addObject("news","1自定义异常。");
+        }else if (e instanceof ClassCastException){
+            modelAndView.addObject("news","2类型转换异常");
+        }
+        modelAndView.setViewName("error");
+        return modelAndView;
+    }
+}
+```
+### 配置异常处理器
+```xml
+ <bean class="com.mosheyu.exception.ExceptionTest2"></bean>
+```
+# SSM学习第九章节——SpringAOP
 
 
