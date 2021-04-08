@@ -1415,12 +1415,174 @@ public class ExceptionTest2 implements HandlerExceptionResolver {
  <bean class="com.mosheyu.exception.ExceptionTest2"></bean>
 ```
 # SSM学习第九章节——SpringAOP
+* * *
 ## Spring的AOP简介
+* * *
 ### AOP
-AOP为`Aspect Oriented Peogramming`的缩写，意思为**面向切面编程**。通过预编译方式和运行期间动态代理，实现程序功能的统一维护的一种技术。
-
+* * *
+AOP为`Aspect Oriented Peogramming`的缩写，意思为**面向切面编程**。通过预编译方式和运行期间动态代理，实现程序功能的统一维护的一种技术。  
+作用：在程序运行期间，在不修改源码的情况下，对方法进行功能增强。  
+优势：减少重复代码，提高开发效率，便于维护。
+### AOP的动态代理技术
+* * *
+常见的动态代理技术：  
+1. JDK代理：基于接口的动态代理技术。
+2. cglib代理：基于父类的动态代理技术。  
+### AOP相关概念
+* * *
+Target(目标对象)：代理的目标对象。  
+Proxy（代理）：一个类被AOP增强后，就产生一个结果代理类。  
+Joinpoint（连接点）：被拦截到的点，在Spring中，这些点是可以被拦截到的方法，因为Spring只支持方法类型的连接点。  
+Pointcut（切入点）：简称为切点，是指真正使用的连接点。指要对哪些Joinpoint进行拦截的定义。    
+//   **注**：连接点是**可以**被增强的方法，但是不一定被增强。切入点是连接点中，**被增强**的方法。  
+Advice(通知/增强):拦截到Joinpoint（连接点）之后要做的事情存在一个方法中，这个方法，就是增强/通知。  
+Aspect(切面)：是切入点和通知（引介)的结合。  
+Weaving（织入）：将切点和增强结合的过程。  
+### AOP开发明确的事项
+* * *
+#### 需要编写的内容
+* * *
+编写核心业务代码（目标类的目标方法，切点）  
+编写切面类（存储增强方法的类），切面类中有通知（增强/通知）    
+在配置文件中，配置织入关系，即哪些通知与哪些连接点结合。    
+#### AOP技术实现的内容
+* * *
+Spring框架监控切入点方法的执行，一点监控到切入点方法被执行，就使用代理机制，动态的创建目标对象的代理对象，根据通知类别，在代理对象的对应位置，将通知对应的功能织入，完成完整的代码逻辑运行。    
+#### AOP底层使用的代理
+* * *
+Spring框架会根据目标类是否实现了接口，来自动判断使用哪种动态代理的方式。
 ## 基于XML的AOP开发
+* * *
+### 入门步骤
+* * *
+1. 导入AOP相关坐标
+2. 创建目标接口或目标类。（切点）
+3. 创建切面类，方法。（增强）
+4. 将目标类和切面类的对象创建权交给spring。（spring配置）
+5. 在spring配置文件中配置织入关系。   
 
+导入坐标    
+```xml
+ <dependency>
+     <groupId>org.aspectj</groupId>
+     <artifactId>aspectjweaver</artifactId>
+     <version>1.8.4</version>
+ </dependency>
+```
+目标类
+```java
+public class Target implements TargetInterface {
+
+    @Override
+    public void save() {
+        System.out.println("save方法。");
+    }
+}
+```
+目标接口
+```java
+public interface TargetInterface {
+    public void save();
+}
+```
+切面类
+```java
+public class AspectTest {
+    public void before(){
+        System.out.println("前置增强。");
+    }
+}
+```
+将目标类和切面类交给Spring管理
+```xml
+<beans>
+   <!--    目标对象-->
+   <bean id="target" class="com.mosheyu.aop.Target"></bean>
+   <!--    切面对象-->
+   <bean id="aspectTest" class="com.mosheyu.aop.AspectTest"></bean>
+</beans>
+```
+配置切点和增强的关系（需要引入命名空间）
+
+```xml
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:aop="http://www.springframework.org/schema/aop"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+       http://www.springframework.org/schema/beans/spring-beans.xsd
+       http://www.springframework.org/schema/aop
+       http://www.springframework.org/schema/aop/spring-aop.xsd
+">   <!--    引入命名空间AOP-->
+   <aop:config>
+      <!--        声明切面-->
+      <aop:aspect ref="aspectTest">
+         <!--     配置切点和通知-->
+         <aop:before method="before" pointcut="execution(public void com.mosheyu.aop.Target.save())"></aop:before>
+      </aop:aspect>
+   </aop:config>
+</beans>
+```
+### 切点表达式
+* * *
+表达式语法：`execution([修饰符] 返回值类型 包名.类名.方法名(参数))`    
+访问修饰符可以省略。   
+返回值类型，包名，类名，方法名可以使用星号*代表所有。  
+包名与类名之间的一个点，代表当前包下的类，两个点，表示当前包及其子包下的类。   
+参数列表可以使用两个点，表示任意个数、类型的参数列表。   
+### 切点表达式抽取
+* * *
+当某个表达式多次使用时，可以抽取出来，然后通过pointcut-ref属性来引用。
+```xml
+<aop:config>
+   <aop:aspect ref="aspectTest">
+      <aop:pointcut id="PointcutTest" expression="execution(public void com.mosheyu.aop.Target.save())"/>
+      <aop:before method="before" pointcut-ref="PointcutTest"></aop:before>
+   </aop:aspect>
+</aop:config>
+```
+### 通知类型
+* * *
+|名称|标签|说明|
+|---|---|---|
+|前置通知|\<aop:before>|指定增强的方法在切入点方法之前执行。|
+|后置通知|\<aop:after-returning>|指定增强的方法在切入点之后执行。|
+|环绕通知|\<aop:around>|指定增强的方法在切入点方法之前和之后都执行。<br />一般会携带参数`ProceedingJoinPoint`。执行对应的方法proceed()。|
+|异常抛出通知|\<aop:throwing>|指定增强的方法在出现异常时执行。|
+|最终通知|\<aop:after>|无论增强方法是否执行，是否有异常，都会执行此通知。|
 ## 基于注解的AOP开发
+* * *
+### 入门
+* * *
+步骤：  
+1. 创建目标接口和目标类。（切点）
+2. 创建切面类。（增强）
+3. Spring配置文件中配置bean。
+4. 在切面类中使用注解配置织入关系。
+5. 在配置文件中开启组件扫描和AOP的自动代理。
 
-
+注解配置织入关系
+```java
+@Component("aspectTestAnno")
+@Aspect             //标准当前类是一个切面类。
+public class AspectTest {
+    @Before(value = "execution(public void com.mosheyu.anno.Target.save())")
+    public void before(){
+        System.out.println("前置增强。");
+    }
+    @Around(value = "execution(public void com.mosheyu.anno.Target.save())")
+    public Object aroud(ProceedingJoinPoint pro) throws Throwable {
+        System.out.println("环绕前。");
+        Object ob = pro.proceed();
+        System.out.println("环绕后。");
+        return ob;
+    }
+}
+```
+开启组件扫描和AOP的自动代理
+```xml
+<beans>
+   <context:component-scan base-package="com.mosheyu.anno"/>
+   <aop:aspectj-autoproxy/>
+</beans>
+```
+# SSM学习第十章节——Spring事务

@@ -1,0 +1,9 @@
+package com.mosheyu.proxy.jdk;
+
+public class Target implements TargetInterface{
+
+    @Override
+    public void save() {
+        System.out.println("save方法。");
+    }
+}
