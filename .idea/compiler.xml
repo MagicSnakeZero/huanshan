@@ -8,6 +8,7 @@
         <outputRelativeToContentRoot value="true" />
         <module name="acpt07" />
         <module name="acpt06" />
+        <module name="acpt09" />
         <module name="acpt08" />
         <module name="acpt03" />
         <module name="acpt02" />
@@ -25,6 +26,7 @@
       <module name="acpt06" target="11" />
       <module name="acpt07" target="11" />
       <module name="acpt08" target="11" />
+      <module name="acpt09" target="11" />
       <module name="apct" target="1.5" />
     </bytecodeTargetLevel>
   </component>

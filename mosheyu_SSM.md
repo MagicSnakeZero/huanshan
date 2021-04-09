@@ -1585,4 +1585,170 @@ public class AspectTest {
    <aop:aspectj-autoproxy/>
 </beans>
 ```
-# SSM学习第十章节——Spring事务
+# SSM学习第十章节——Spring事务控制
+* * *
+## 编程式事务控制相关对象
+* * *
+### PlatformTransactionManager
+`PlatformTransactionManager`接口是Spring的事务管理器（平台事务管理器） 。
+
+|方法|说明|
+| --- | --- |
+|`TransactionStatus  getTransaction(TransactionDefination  defination)`|获取事务的状态信息。|
+|`void  commit(TransactionStatus status)`|提交事务。|
+|`void rollback(TransactionStatus  status)`|回滚事务。|
+
+Spring对于这个接口有不同的实现类。    
+例如：    
+当Dao层是jdbc或者mybaits时：`org.springframework.jdbc.datasource.DataSourceTransactionManager`。    
+当Dao层是Hibernate时：`org.springframework.orm.hibernate5.HibernateTransactionManager`。
+
+### TransactionDefinition
+* * *
+`TransactionDefinition`事务定义器。
+
+|方法|说明|
+|---|---|
+|`int getIsolationLevel()`|获得事务的隔离级别。|
+|`int getPropogetionBehavior()`|获得事务的传播行为。|
+|`int getTimeout()`|获得超过时间。|
+|`boolean isReadOnly()`|是否只读。|
+
+#### 事务隔离级别
+* * *
+设置隔离级别，可以解决事务并发产生的问题，如脏读、不可重复读和复读。    
+* ISOLATION_DEFAULT
+* ISOLATION_READ_UNCOMMITTED
+* ISOLATION_READ_COMMITTED
+* ISOLATION_REPEATABLE_READ
+* ISOLATION_SERIALIZABLE
+#### 事务的传播行为
+* * *
+|行为|说明|
+|---|---|
+|REQUIRED|如果当前没有事务，就新建一个事务，如果已经存在一个事务中，就加入到这个事务中。一般的选择。（默认值）|
+|SUPPORTS|支持当前事务，如果当前没有事务，就以非事务方式执行。（没有事务）|
+|MANDATORY|使用当前的事务，如果当前没有事务，就抛出异常。|
+|REQUERS_NEW|新建事务，如果当前在事务中，就把当前事务挂起。|
+|NOT_SUPPORTED|以非事务方式执行操作，如果当前存在事务，就把到当前事务挂起。|
+|NEVER|以非事务方式运行，如果当前存在事务，抛出异常。|
+|NESTED|如果当前存在事务，则在嵌套事务内执行，如果当前没有事务，则执行REQUIRED类似的操作。|
+|超时时间|默认值是-1，没有超时限制，如果有，以秒为单位进行设置。|
+|是否只读|建议查询时设置为只读。|
+### TransactionStatus
+* * *
+`TransactionStatus`接口提供事务具体的运行状态，方法如下：   
+
+|方法|说明|
+|---|---|
+|`boolean hasSavepoint()`|是否存储回滚点。|
+|`boolean isCompleted()`|事务是否完成。|
+|`boolean isNewTransaction()`|是否是新事务。|
+|`boolean isRollbackOnly()`|事务是否回滚。|
+## 基于XML的声明式事务控制
+* * *
+声明，指在配置文件中声明，用在Spring配置文件中声明式的处理事务来代理代码式的处理事务。    
+作用：事务管理不影响开发的组件，在修改事务时，只需要在定义文件中重新配置，以此解耦合。    
+事务底层实际使用的是AOP的方式来制成的。所以在使用事务之前需要明确三点：切点，通知，切面。    
+使用步骤：   
+引入命名空间tx，配置事务的增强,织入增强。
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:aop="http://www.springframework.org/schema/aop"
+       xmlns:tx="http://www.springframework.org/schema/tx"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+            http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop.xsd
+            http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd
+            http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx.xsd">
+
+   <context:property-placeholder location="classpath:jdbc.properties"/>
+   <bean id="datasSource" class="com.mchange.v2.c3p0.ComboPooledDataSource">
+      <property name="driverClass" value="${jdbc.driver}"></property>
+      <property name="jdbcUrl" value="${jdbc.url}"></property>
+      <property name="user" value="${jdbc.username}"></property>
+      <property name="password" value="${jdbc.password}"></property>
+   </bean>
+   <bean id="jdbcTemplate" class="org.springframework.jdbc.core.JdbcTemplate">
+      <property name="dataSource" ref="datasSource"></property>
+   </bean>
+   <bean id="accountDao" class="com.mosheyu.dao.impl.AccountDaoImpl">
+      <property name="jdbcTemplate" ref="jdbcTemplate"></property>
+   </bean>
+
+   <!--    目标对象，内部方法即切点。        -->
+   <bean id="accountService" class="com.mosheyu.service.impl.AccountServiceImpl">
+      <property name="accountDao" ref="accountDao"></property>
+   </bean>
+   <!--    配置平台事务管理器-->
+   <bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+      <!--        注入DataSource-->
+      <property name="dataSource" ref="datasSource"></property>
+   </bean>
+
+   <!--    增强  事务通知    -->
+   <tx:advice id="txAdvice" transaction-manager="transactionManager">
+      <!--        事务属性    -->
+      <tx:attributes>
+         <!--                切点方法以及事务参数的配置   分别是：切点方法名   隔离级别 传播行为  超时时间 是否只读-->
+         <tx:method name="transfer" isolation="REPEATABLE_READ" propagation="REQUIRED" timeout="-1" read-only="false"/>
+       <!--            find*   以find开头-->
+         <tx:method name="find*" isolation="REPEATABLE_READ" propagation="REQUIRED" timeout="-1" read-only="false"/>
+         <!--            任意方法-->        
+         <tx:method name="*"/>
+      </tx:attributes>
+   </tx:advice>
+   <!--    配置事务的织入-->
+   <aop:config>
+      <aop:advisor advice-ref="txAdvice" pointcut="execution(* com.mosheyu.service.impl.*.*(..))"></aop:advisor>
+   </aop:config>
+</beans>
+```
+## 基于注解的声明式事务控制
+* * *
+配置自动扫描和事务的注解。
+```xml
+<beans>
+   <!--    配置平台事务管理器-->
+   <bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+      <!--        注入DataSource-->
+      <property name="dataSource" ref="datasSource"></property>
+   </bean>
+   <!--    基于注解的声明式事务配置-->
+   <context:component-scan base-package="com.mosheyu"/>
+   <!--    事务的注解驱动-->
+   <tx:annotation-driven transaction-manager="transactionManager"/>
+</beans>
+```
+方法加注解。
+```java
+@Repository(value = "accountService")
+@Transactional(isolation = Isolation.READ_COMMITTED,propagation = Propagation.REQUIRED)
+public class AccountServiceImpl implements AccountService {
+    @Autowired
+    private AccountDao accountDao;
+    @Override
+//    @Transactional(isolation = Isolation.READ_COMMITTED,propagation = Propagation.REQUIRED)
+    public void transfe(String outMan, String inMan, double money) {
+        accountDao.out(outMan,money);
+//        int i =1/0;
+        accountDao.in(inMan,money);
+    }
+}
+```
+# SSM学习第十一章节——MyBatis
+* * *
+## MyBatis简介
+* * *
+## MyBatis快速入门
+* * *
+## MyBatis映射文件概述
+* * *
+## MyBatis增删改查操作
+* * *
+## MyBatis核心配置文件概述
+* * *
+## MyBatis相应API
+* * *
