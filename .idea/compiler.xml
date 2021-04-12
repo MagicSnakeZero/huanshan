@@ -14,6 +14,7 @@
         <module name="acpt02" />
         <module name="acpt05" />
         <module name="acpt04" />
+        <module name="acpt10" />
         <module name="acpt" />
       </profile>
     </annotationProcessing>
@@ -27,6 +28,7 @@
       <module name="acpt07" target="11" />
       <module name="acpt08" target="11" />
       <module name="acpt09" target="11" />
+      <module name="acpt10" target="11" />
       <module name="apct" target="1.5" />
     </bytecodeTargetLevel>
   </component>
