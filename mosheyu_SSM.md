@@ -2020,3 +2020,50 @@ void rollback()
 ```
 # SSM学习第十二章节——MyBatis的Dao层实现
 * * *
+## 传统开发方式
+* * *
+如十一章一样进行开发，比较繁琐，且大部分还是由程序员手动编写，比较繁琐，但是其实大部分代码是相同的，可省略的。   
+## 代理开发方式
+需要遵守规范：    
+1. Mapper.xml文件中的namespace与mapper接口全限定名相同。
+2. Mapper接口方法名和Mapper.xml中定义的每个statement的id相同。
+3. Mapper接口方法的输入参数类型和mapper.xml中定义的每个sql的parameterType的类型相同。
+4. Mapper接口方法的输出参数类型和mapper.xml中定义的每个sql的resultType的类型相同。
+
+java方法中使用
+```java
+InputStream resourceAsStream = Resources.getResourceAsStream("sqlMapConfig.xml");
+SqlSessionFactory build = new SqlSessionFactoryBuilder().build(resourceAsStream);
+SqlSession sqlSession = build.openSession();
+
+UserMapper mapper = sqlSession.getMapper(UserMapper.class);
+List<User> user = mapper.findAll();
+System.out.println(user);
+System.out.println("*****");
+User user1 = mapper.findById(1);
+System.out.println(user1);       
+```
+UserMapper.xml文件
+```xml
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.mosheyu.dao.UserMapper">
+    <select id="findAll" resultType="com.mosheyu.domain.User">
+        select  * from user
+    </select>
+    <select id="findById" parameterType="int" resultType="com.mosheyu.domain.User">
+        select  * from user where id = #{id}
+    </select>
+</mapper>
+```
+UserMapper接口代码
+```java
+
+public interface UserMapper {
+
+    public List<User> findAll() throws IOException;
+
+    public User findById(int id);
+}
+```
+# SSM学习第十三章节——MyBatis的映射文件
