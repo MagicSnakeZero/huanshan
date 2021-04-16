@@ -15,6 +15,7 @@
         <module name="acpt05" />
         <module name="acpt04" />
         <module name="acpt10" />
+        <module name="acpt12" />
         <module name="acpt" />
         <module name="acpt11" />
       </profile>
@@ -31,6 +32,7 @@
       <module name="acpt09" target="11" />
       <module name="acpt10" target="11" />
       <module name="acpt11" target="11" />
+      <module name="acpt12" target="11" />
       <module name="apct" target="1.5" />
     </bytecodeTargetLevel>
   </component>

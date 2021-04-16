@@ -2024,6 +2024,7 @@ void rollback()
 * * *
 如十一章一样进行开发，比较繁琐，且大部分还是由程序员手动编写，比较繁琐，但是其实大部分代码是相同的，可省略的。   
 ## 代理开发方式
+* * *
 需要遵守规范：    
 1. Mapper.xml文件中的namespace与mapper接口全限定名相同。
 2. Mapper接口方法名和Mapper.xml中定义的每个statement的id相同。
@@ -2067,3 +2068,77 @@ public interface UserMapper {
 }
 ```
 # SSM学习第十三章节——MyBatis的映射文件
+* * *
+## 标签
+* * *
+### if
+* * *
+```xml
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.mosheyu.mapper.UserMapper">
+    <select id="findByCondition" parameterType="com.mosheyu.domain.User" resultType="com.mosheyu.domain.User">
+        select * from user 
+        <where>
+           <if test="id!=0">
+              and id=#{id}
+           </if>
+           <if test="username!=null">
+              and username=#{username}
+           </if>
+           <if test="password!=null">
+              and password=#{password}
+           </if>
+        </where>
+    </select>
+</mapper>
+```
+if用来判断条件，用于在查询前对查询条件进行筛选，where标签相当于1=1的作用，用来保证无查询条件时，空有一个where不报错。    
+### foreach
+* * *
+```xml
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.mosheyu.mapper.UserMapper">
+    <select id="findByIds" parameterType="list" resultType="user">
+        select * from user 
+        <where>
+            <foreach collection="list" open="id in (" close=")" item="listid" separator=",">
+                #{listid}
+            </foreach>
+        </where>
+    </select>
+</mapper>
+```
+where同样用于保证为空不报错，foreach用于将数据填充，相当`id in (1,2,3,4)`中填充数据。其中collection用于传入集合，如果是数组使用array，open指明用什么开头，close指明用什么结尾，listid是自己命名的使用每个数据时的替代名，separator指明使用什么间隔。    
+### sql抽取
+* * *
+sql标签指明sql语句。
+include标签可以引用某一SQL语句。
+```xml
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.mosheyu.mapper.UserMapper">
+   <!--    sql语句抽取-->
+    <sql id="selectUser">select * from user</sql>
+    <select id="findByCondition" parameterType="com.mosheyu.domain.User" resultType="com.mosheyu.domain.User">
+    <!--   引用sql语句-->
+        <include refid="selectUser"></include>
+        <where>
+            <if test="id!=0">
+                and id=#{id}
+            </if>
+            <if test="username!=null">
+                and username=#{username}
+            </if>
+            <if test="password!=null">
+                and password=#{password}
+            </if>
+        </where>
+    </select>
+</mapper>
+```
+# SSM学习第十四章节——MyBatis的核心配置文件
+
+
+
