@@ -336,7 +336,7 @@ public class UserController {
 ```
 ## SpringMVC的组件解析
 * * *
-###SpringMVC的相关组件
+### SpringMVC的相关组件
 * * *
 |组件|名称|
 |---|---|
@@ -556,7 +556,6 @@ public class UserController {
       String json  = objectMapper.writeValueAsString(user);
       return  json;
    }
-
 }
 ```
 #### 返回对象或集合。
@@ -989,6 +988,7 @@ public class UserController {
 |---|---|
 |value|请求头的名称。|
 |required|是否必须携带此请求头。|
+
 代码举例：
 ```java
 @Controller
@@ -1009,6 +1009,7 @@ public class UserController {
 |---|---|
 |value|指定cookie的名称。|
 |required|是否必须携带此cookie。|
+
 代码举例：
 ```java
 @Controller
@@ -2139,6 +2140,152 @@ include标签可以引用某一SQL语句。
 </mapper>
 ```
 # SSM学习第十四章节——MyBatis的核心配置文件
+* * *
+## 常用标签
+* * *
+1. properties标签：该标签可以加载外部的properties文件
+2. typeAliases标签：设置类型别名
+3. environments标签：数据源环境配置标签
+4. typeHandlers标签：配置自定义类型处理器
+5. plugins标签：配置MyBatis的插件
+## typeHandlers标签
+* * *
+你可以重写类型处理器或创建你自己的类型处理器来处理不支持的或非标准的类型。    
+具体做法为：实现 org.apache.ibatis.type.TypeHandler 接口， 或继承一个很便利的类 org.apache.ibatis.type.BaseTypeHandler，       
+然后可以选择性地将它映射到一个JDBC类型。     
+例如需求：一个Java中的Date数据类型，我想将之存到数据库的时候存成一个1970年至今的毫秒数，取出来时转换成java的Date，即java的Date与数据库的varchar毫秒值之间转换。
 
+开发步骤：
+1. 定义转换类继承类BaseTypeHandler<T>
+2. 覆盖4个未实现的方法，其中setNonNullParameter为java程序设置数据到数据库的回调方法，getNullableResult为查询时 mysql的字符串类型转换成 java的Type类型的方法
+3. 在MyBatis核心配置文件中进行注册
+4. 测试转换是否正确
 
+定义类型转换类,实现方法。
+```java
+public class DateTypeHandler extends BaseTypeHandler<Date> {
+    //将java的类型转换为数据库需要的类型
+    //i是对应的列
+    @Override
+    public void setNonNullParameter(PreparedStatement preparedStatement, int i, Date date, JdbcType jdbcType) throws SQLException {
+        long time = date.getTime();
+        preparedStatement.setLong(i,time);
+    }
+    //将数据库中的数据类型转换为java类型。
+    //String是数据库中字段的名称，ResultSet是查询结果集
+    @Override
+    public Date getNullableResult(ResultSet resultSet, String s) throws SQLException {
+        //获取数据库中需要的数据（long)转换为需要的类型。
+        long time = resultSet.getLong(s);
+        Date date = new Date(time);
+        return date;
+    }
+    //将数据库中的数据类型转换为java类型。
+    @Override
+    public Date getNullableResult(ResultSet resultSet, int i) throws SQLException {
+        long time = resultSet.getLong(i);
+        Date date = new Date(time);
+        return date;
+    }
+    //将数据库中的数据类型转换为java类型。
+    @Override
+    public Date getNullableResult(CallableStatement callableStatement, int i) throws SQLException {
+        long time = callableStatement.getLong(i);
+        Date date = new Date(time);
+        return date;
+    }
+}
+```
+sqlMapConfig.xml配置文件中注册
+```xml
+<configuration>
+   <typeHandlers>
+      <typeHandler handler="com.mosheyu.handler.DateTypeHandler"></typeHandler>
+   </typeHandlers>
+</configuration>
+```
+测试
+```java
+@Test
+public void test1() throws IOException {
+     InputStream resourceAsStream = Resources.getResourceAsStream("sqlMapConfig.xml");
+     SqlSessionFactory build = new SqlSessionFactoryBuilder().build(resourceAsStream);
+     SqlSession sqlSession = build.openSession();
+
+     UserMapper userMapper = sqlSession.getMapper(UserMapper.class);
+
+     User user = new User();
+     user.setId(5);
+     user.setUsername("test");
+     user.setPassword("12334");
+     user.setBirthday(new Date());
+
+     userMapper.save(user);
+
+     sqlSession.commit();
+     sqlSession.close();
+    }    
+```
+## plugins标签
+MyBatis可以使用第三方的插件来对功能进行扩展，分页助手PageHelper是将分页的复杂操作进行封装，使用简单的方式即可获得分页的相关数据    
+开发步骤：    
+1. 导入通用PageHelper的坐标
+2. 在mybatis核心配置文件中配置PageHelper插件
+3. 测试分页数据获取
+
+导入坐标
+```xml
+<dependency>
+   <groupId>com.github.pagehelper</groupId>
+   <artifactId>pagehelper</artifactId>
+   <version>3.7.5</version>
+</dependency>
+<dependency>
+    <groupId>com.github.jsqlparser</groupId>
+    <artifactId>jsqlparser</artifactId> 
+    <version>0.9.1</version>
+</dependency>        
+```
+配置文件中配置插件
+```xml
+<plugins>
+   <plugin interceptor="com.github.pagehelper.PageHelper">
+      <property name="dialect" value="mysql"/>
+   </plugin>
+</plugins>    
+
+```
+测试使用
+```java
+    @Test
+    public void test3() throws IOException {
+        InputStream resourceAsStream = Resources.getResourceAsStream("sqlMapConfig.xml");
+        SqlSessionFactory build = new SqlSessionFactoryBuilder().build(resourceAsStream);
+        SqlSession sqlSession = build.openSession();
+
+        UserMapper userMapper = sqlSession.getMapper(UserMapper.class);
+        PageHelper.startPage(2,2);
+        List<User> users = userMapper.findAll();
+        for (User user : users){
+            System.out.println(user);
+        }
+        PageInfo<User> pageInfo = new PageInfo<>(users);
+        System.out.println("当前页:"+pageInfo.getPageNum());
+        System.out.println("每页显示条数:"+pageInfo.getPageSize());
+        System.out.println("总条数:"+pageInfo.getTotal());
+        System.out.println("总页数:"+pageInfo.getPages());
+        System.out.println("上一页页数:"+pageInfo.getPrePage());
+        System.out.println("上一页页数:"+pageInfo.getNextPage());
+        System.out.println("是否是第一页:"+pageInfo.isIsFirstPage());
+        System.out.println("是否是最后一页:"+pageInfo.isIsLastPage());
+
+        sqlSession.commit();
+        sqlSession.close();
+
+    }
+```
+# SSM学习第十五章节——MyBatis的多表操作
+* * *
+## 多表查询
+* * *
 
