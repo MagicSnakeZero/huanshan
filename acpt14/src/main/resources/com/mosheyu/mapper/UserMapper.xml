@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.mosheyu.mapper.UserMapper">
+    <resultMap id="userNap" type="user">
+        <id column="uid" property="id"></id>
+        <result column="username" property="username"></result>
+        <result column="password" property="password"></result>
+        <result column="birthday" property="birthday"></result>
+<!--        配置order集合-->
+<!--        property    集合名称-->
+<!--        ofType      当前集合中的集合类型-->
+        <collection property="orderList" ofType="order">
+<!--            封装order的数据-->
+            <id column="oid" property="id"></id>
+            <result column="orderTime" property="orderTime"></result>
+            <result column="total" property="total"></result>
+        </collection>
+    </resultMap>
+    <select id="findAll" resultMap="userNap">
+        select *,o.id oid from user u,orders o where o.uid=u.id
+    </select>
+
+    <resultMap id="userRoleMap" type="user">
+        <id column="id" property="id"></id>
+        <result column="username" property="username"></result>
+        <result column="password" property="password"></result>
+        <result column="birthday" property="birthday"></result>
+<!--        user内部的RoleList信息-->
+        <collection property="roleList" ofType="role">
+            <id column="roleid" property="id"></id>
+            <result column="roleName" property="roleName"></result>
+            <result column="roleDesc" property="roleDesc"></result>
+        </collection>
+    </resultMap>
+    <select id="findUserAndRoleAll" resultMap="userRoleMap">
+        select * from sys_user u,sys_user_role ur,sys_role r where u.id=ur.userId AND ur.roleId = r.id
+    </select>
+</mapper>

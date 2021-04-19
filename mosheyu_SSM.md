@@ -2286,6 +2286,112 @@ MyBatis可以使用第三方的插件来对功能进行扩展，分页助手Page
 ```
 # SSM学习第十五章节——MyBatis的多表操作
 * * *
-## 多表查询
+## 一对一
 * * *
+生成java对象映射数据库。
+```java
+public class Order {
+   private int id;
+   private Date orderTime;
+   private double total;
 
+   private User user;
+}
+```
+xml配置文件配置字段和实体的对应关系
+```xml
+<mapper namespace="com.mosheyu.mapper.OrderMapper">
+    <resultMap id="ordermap" type="order">
+        <id column="oid"  property="id"></id>
+        <result column="ordertime" property="orderTime"></result>
+        <result column="total" property="total"></result>
+        <association property="user" javaType="user">
+            <id column="uid" property="id"></id>
+            <result column="username" property="username"></result>
+            <result column="password" property="password"></result>
+            <result column="birthday" property="birthday"></result>
+        </association>
+    </resultMap>
+</mapper>
+```
+OrderMapper.xml配置文件中实际使用。
+```xml
+<mapper namespace="com.mosheyu.mapper.OrderMapper">
+    <select id="findAll" resultMap="ordermap">
+        select *,o.id oid from orders o,user u where o.uid=u.id
+    </select>
+</mapper>
+```
+## 一对多
+* * *
+java实体User
+```java
+public class User {
+   private int id;
+   private String username;
+   private String password;
+   private Date birthday;
+
+   private List<Order> orderList;
+}
+```
+xml配置文件配置字段和实体的对应关系。
+```xml
+<mapper namespace="com.mosheyu.mapper.UserMapper">
+    <resultMap id="userNap" type="user">
+        <id column="uid" property="id"></id>
+        <result column="username" property="username"></result>
+        <result column="password" property="password"></result>
+        <result column="birthday" property="birthday"></result>
+        <collection property="orderList" ofType="order">
+            <id column="oid" property="id"></id>
+            <result column="orderTime" property="orderTime"></result>
+            <result column="total" property="total"></result>
+        </collection>
+    </resultMap>
+</mapper>
+```
+UserMapper.xml文件中实际使用。
+```xml
+<mapper namespace="com.mosheyu.mapper.UserMapper">
+    <select id="findAll" resultMap="userNap">
+        select *,o.id oid from user u,orders o where o.uid=u.id
+    </select>
+</mapper>
+```
+## 多对多
+* * *
+java实体Role
+```java
+public class Role {
+   public int id;
+   public String roleName;
+   public String roleDesc;
+}
+```
+xml配置文件配置字段和实体的对应关系。
+```xml
+<mapper namespace="com.mosheyu.mapper.UserMapper">
+    <resultMap id="userRoleMap" type="user">
+        <id column="id" property="id"></id>
+        <result column="username" property="username"></result>
+        <result column="password" property="password"></result>
+        <result column="birthday" property="birthday"></result>
+        <collection property="roleList" ofType="role">
+            <id column="roleid" property="id"></id>
+            <result column="roleName" property="roleName"></result>
+            <result column="roleDesc" property="roleDesc"></result>
+        </collection>
+    </resultMap>
+</mapper>
+```
+UserMapper.xml文件中实际使用。
+```xml
+<mapper namespace="com.mosheyu.mapper.UserMapper">
+    <select id="findUserAndRoleAll" resultMap="userRoleMap">
+        select * from sys_user u,sys_user_role ur,sys_role r where u.id=ur.userId AND ur.roleId = r.id
+    </select>
+</mapper>
+```
+# SSM学习第十六章节——MyBatis的注解配置
+* * *

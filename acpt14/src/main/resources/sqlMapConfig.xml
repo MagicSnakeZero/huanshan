@@ -8,8 +8,9 @@
     <!--    定义别名-->
     <typeAliases>
         <typeAlias type="com.mosheyu.domain.User" alias="user"></typeAlias>
+        <typeAlias type="com.mosheyu.domain.Order" alias="order"></typeAlias>
+        <typeAlias type="com.mosheyu.domain.Role" alias="role"></typeAlias>
     </typeAliases>
-
     <!--    自定义类型处理器-->
     <typeHandlers>
         <typeHandler handler="com.mosheyu.handler.DateTypeHandler"></typeHandler>
@@ -47,6 +48,7 @@
     <!--    加载映射文件-->
     <mappers>
         <mapper resource="com/mosheyu/mapper/UserMapper.xml"></mapper>
+        <mapper resource="com/mosheyu/mapper/OrderMapper.xml"></mapper>
     </mappers>
 
 </configuration>
