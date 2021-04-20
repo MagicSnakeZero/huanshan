@@ -16,6 +16,7 @@
         <module name="acpt13" />
         <module name="acpt05" />
         <module name="acpt04" />
+        <module name="acpt15" />
         <module name="acpt10" />
         <module name="acpt12" />
         <module name="acpt" />
@@ -37,6 +38,7 @@
       <module name="acpt12" target="11" />
       <module name="acpt13" target="11" />
       <module name="acpt14" target="11" />
+      <module name="acpt15" target="11" />
       <module name="apct" target="1.5" />
     </bytecodeTargetLevel>
   </component>

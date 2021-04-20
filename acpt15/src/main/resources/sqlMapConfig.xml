@@ -8,23 +8,12 @@
     <!--    定义别名-->
     <typeAliases>
         <typeAlias type="com.mosheyu.domain.User" alias="user"></typeAlias>
-        <typeAlias type="com.mosheyu.domain.Orders" alias="order"></typeAlias>
         <typeAlias type="com.mosheyu.domain.Role" alias="role"></typeAlias>
     </typeAliases>
     <!--    自定义类型处理器-->
     <typeHandlers>
         <typeHandler handler="com.mosheyu.handler.DateTypeHandler"></typeHandler>
     </typeHandlers>
-
-<!--    配置分页助手插件-->
-    <plugins>
-        <plugin interceptor="com.github.pagehelper.PageHelper">
-<!--            指定方言，因为不同数据库使用了不同的分页关键字。-->
-<!--            但是pageheper的版本超过4.0之后，就不再支持com.github.pagehelper.PageHelper.-->
-<!--                需要改为com.github.pagehelper.PageInteroeptor,并且不需要再指定方言。-->
-            <property name="dialect" value="mysql"/>
-        </plugin>
-    </plugins>
 
 
     <!--    配置数据源环境-->
@@ -45,10 +34,12 @@
     </environments>
 
 
-    <!--    加载映射文件-->
-    <mappers>
-        <mapper resource="com/mosheyu/mapper/UserMapper.xml"></mapper>
-        <mapper resource="com/mosheyu/mapper/OrderMapper.xml"></mapper>
-    </mappers>
+
+<!--    加载映射关系-->
+        <mappers>
+<!--            指定一个包下的接口-->
+            <package name="com.mosheyu.mapper" />
+        </mappers>
+
 
 </configuration>

@@ -2395,3 +2395,185 @@ UserMapper.xml文件中实际使用。
 ```
 # SSM学习第十六章节——MyBatis的注解配置
 * * *
+## 常用注解
+* * *
+|注解|说明|
+|---|---|
+|@Insert|实现新增|
+|@Update|实现更新|
+|@Delete|实现删除|
+|@Select|实现查询|
+|@Result|实现结果集封装|
+|@Results|可以与@Result一齐使用，封装多个结果集|
+|@One|实现一对一结果集封装|
+|@Many|实现一对多结果集封装|
+
+## 原映射文件配置
+```xml
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.mosheyu.mapper.UserMapper">
+   <insert id="save" parameterType="user">
+      insert into user values(#{id},#{username},#{password},#{birthday})
+   </insert>
+
+   <update id="update" parameterType="user">
+      update user set username=#{username},password=#{password} where id=#{id}
+   </update>
+
+   <delete id="delete" parameterType="int">
+      delete from user where id=#{id}
+   </delete>
+
+   <select id="findById" parameterType="int" resultType="user">
+      select * from user where id=#{id}
+   </select>
+
+   <select id="findAll" resultType="user">
+      select * from user
+   </select>
+</mapper>
+```
+## 接口注解
+配置文件加载映射关系
+```xml
+<mappers>
+   <package name="com.mosheyu.mapper" />
+</mappers>        
+```
+接口配置注解
+```java
+public interface UserMapper {
+    @Insert(value = "insert into user values(#{id},#{username},#{password},#{birthday})")
+    public void save(User user);
+    @Update("update user set username=#{username},password=#{password} where id=#{id}")
+    public void update(User user);
+    @Delete("delete from user where id=#{id}")
+    public void delete(int id);
+    @Select("select * from user where id=#{id}")
+    public void findById(int id);
+    @Select("select * from user")
+    public List<User> findAll();
+}
+```
+## 复杂的注解开发
+* * *
+|注解|说明|
+|---|---|
+|@Results|代替\<resultMap>，该注解中可以使用单个@Result注解，或者@Result集合。<br/>使用格式：@Result（{@Resutl()，@Resutl()}），或@Resutls(@Resutl())|
+|@Resutl|代替\<id>标签和\<result>标签<br/>@Result属性：<br/>column:数据库的列名。<br/>property:需要装配的属性名。<br/>one：需要使用的@One注解（@Resutl(one=@One)())<br/>many:需要使用的@Many注解(@Resutl(many=@many)()))|
+## 一对一注解
+第一种方式
+* * *
+```java
+public interface OrderMapper {
+
+   @Select("select *,o.id oid from orders o,user u where o.uid=u.id")
+   @Results({
+           @Result(column = "id", property = "id"),
+           @Result(column = "ordertime", property = "ordertime"),
+           @Result(column = "total", property = "total"),
+           @Result(column = "uid", property = "user.id"),
+           @Result(column = "username", property = "user.username"),
+           @Result(column = "password", property = "user.password"),
+   })
+   public List<Orders> findAll();
+
+}
+```
+第二种方式
+```java
+public interface OrderMapper {
+    @Select("select * from orders")
+    @Results({
+            @Result(property = "id",column = "id"),
+            @Result(property = "ordertime",column = "ordertime"),
+            @Result(property = "total",column = "total"),
+            @Result(property = "user",  
+                    column = "id",      
+                    javaType = User.class,  
+                    one = @One(select = "com.mosheyu.mapper.UserMapper.findById"))
+    })
+    public List<Orders> findAll();
+}
+```
+## 一对多注解
+* * *
+userMapper注解
+```java
+public interface UserMapper {
+   @Select("select * from user")
+   @Results({
+           @Result(id = true,property = "id",column = "id"),
+           @Result(property = "username",column = "username"),
+           @Result(property = "password",column = "password"),
+           @Result(property = "birthday",column = "birthday"),
+           @Result(property = "ordersList",
+                   column = "id",
+                   javaType = List.class,
+                   many = @Many(select = "com.mosheyu.mapper.OrderMapper.findByUid"))
+   })
+   public List<User> findUserAndOrdersAll();
+}
+```
+orderMapper注解
+```java
+public interface OrderMapper {
+    @Select("select * from orders where uid=#{uid}")
+    public List<Orders> findByUid(int id);
+}
+```
+## 多对多注解
+* * *
+roleMapper注解
+```java
+public interface RoleMapper {
+    @Select("select * from role r,user_role ur where r.id=ur.role_id and ur.user_id=#{uid}")
+    List<Role> findByUid(int uid);
+}
+```
+userMapper注解
+```java
+public interface UserMapper {
+    @Select("select * from user")
+    @Results({
+            @Result(id = true, property = "id", column = "id"),
+            @Result(property = "username", column = "username"),
+            @Result(property = "password", column = "password"),
+            @Result(property = "birthday", column = "birthday"),
+            @Result(property = "roleList", column = "id",
+                    javaType = List.class,
+                    many = @Many(select = "com.mosheyu.mapper.RoleMapper.findByUid"))
+    })
+    public List<User> findUserAndRoleAll();
+}
+```
+roleMapper注解
+```java
+public interface RoleMapper {
+    @Select("select * from sys_role r,sys_user_role ur where r.id=ur.roleid and ur.userid=#{uid}")
+    List<Role> findByUid(int uid);
+}
+```
+# end
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
